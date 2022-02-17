@@ -4,17 +4,22 @@ function usage {
   printf "Usage: $0 [ -h ] [ -l ]\n"
   printf "  -u [prometheus_urls,...]: coma spearated list of urls (env TMUX_PROMETHEUS_URLS)\n"
   printf "  -l: list urls instead of displaying onlty total number of alerts\n"
+  printf "  -a: display all alerts (not only firing)\n"
   printf "  -h: this help message\n"
   exit 1
 }
 
 o_list=0
+o_all=0
 o_urls=""
 # use environment variable if set
 [ ! -z "${TMUX_PROMETHEUS_URLS}" ] && o_urls=${TMUX_PROMETHEUS_URLS}
 
-while getopts "hlu:" opt; do
+while getopts "hlau:" opt; do
   case "$opt" in
+    a)
+      o_all=1
+      ;;
     l)
       o_list=1
       ;;
@@ -37,9 +42,14 @@ fi
 
 api_alerts="/api/v1/alerts"
 IFS=, read -r -a urls <<< "${o_urls}"
+if (( "$o_all" )); then
+  jq_filter='.data.alerts | length'
+else
+  jq_filter='.data.alerts | map(select(.state=="firing")) | length'
+fi
 declare -A results
 for url in "${urls[@]}"; do
-	results[$url]=$(curl -s ${url}${api_alerts} | jq '.data.alerts | length')
+  results[$url]=$(curl -s ${url}${api_alerts} | jq "$jq_filter")
 done
 
 list_urls=""

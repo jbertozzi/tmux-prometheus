@@ -3,7 +3,13 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$CURRENT_DIR/scripts/helpers.sh"
 
-prometheus_alerts="#($CURRENT_DIR/scripts/get_alerts.sh)"
+all_alerts="$(get_tmux_option '@tmux_prometheus_show_all_alerts')"
+flag=""
+if (( "$all_alerts" )); then
+  flag="-a"
+fi
+
+prometheus_alerts="#($CURRENT_DIR/scripts/get_alerts.sh $flag)"
 
 key="$(get_tmux_option '@tmux_prometheus_bind_key' 'm')"
 
