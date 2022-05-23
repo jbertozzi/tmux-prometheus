@@ -63,6 +63,13 @@ The default binding can be overriden by setting in your `~/.tmux.conf`:
 set -g @tmux_prometheus_bind_key 'o'
 ```
 
+Enable tmux-prometheus in status:
+
+```
+set -g @tmux_power_show_prometheus true
+
+```
+
 By default, the plugin only display firing alerts. To display all alerts:
 
 ```
