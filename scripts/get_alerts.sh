@@ -49,7 +49,7 @@ else
 fi
 declare -A results
 for url in "${urls[@]}"; do
-  results[$url]=$(curl -s ${url}${api_alerts} | jq "$jq_filter")
+  results[$url]=$(curl --connect-timeout 1 -s ${url}${api_alerts} | jq "$jq_filter")
 done
 
 list_urls=""
